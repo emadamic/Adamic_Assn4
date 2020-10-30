@@ -1,0 +1,60 @@
+#! /bin/bash
+
+# BIOL 7863 Intro to Coding: Assignment 4
+# Created by: Emily Adamic, 10/29/2020
+
+# This script will create a new file of voter name, and whether or not they're eligible to vote.
+# It will print the first 10 lines of the original & new file to STDOUT, as well as no. of eligible voters.
+
+# --------------------
+# Print the first 10 lines of the original file to STDOUT.
+# --------------------
+
+echo -e "\nFirst 10 Lines of Original File:\n"
+
+cat possible_voters.txt | head | column -t
+
+# --------------------
+# Make a new file, adding a column if eligible or not.
+# --------------------
+
+# Cut age to a new file.
+cut -f2 possible_voters.txt | grep -v "Age(years)" > ages.txt
+
+# For every line in ages, make an eligibleOrNah.txt file with yes or no.
+> eligibleOrNah.txt  # initialize the file
+while read line;
+do if [ $line -gt 17 ]; then
+elg=yes
+else elg=no
+fi
+echo $elg >> eligibleOrNah.txt
+done < ages.txt
+
+# Make a header file, and bind to a new column file.
+echo "Eligible?" > header_file.txt
+cat header_file.txt eligibleOrNah.txt > new_column.txt
+
+# Find the number of eligible voters.
+numElg=`cat eligibleOrNah.txt | grep yes | wc -l`
+
+
+# Bind the new column to the possible voters file.
+paste possible_voters.txt new_column.txt > new_file.txt
+
+
+# --------------------
+# Print the first 10 lines of the new file and the number of eligible voters.
+# --------------------
+
+echo -e "\n\nFirst 10 Lines of New File:\n"
+cat new_file.txt | head | column -t
+
+echo -e "\n\nThere are $numElg eligible voters!  GO VOTE!!!"
+
+
+# Remove all the rando intermediate files.
+rm header_file.txt eligibleOrNah.txt new_column.txt ages.txt
+
+
+# Donezo!
